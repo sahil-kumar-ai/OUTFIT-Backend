@@ -123,7 +123,3 @@ export const verifyUser = TryCatch(async (req, res) => {
   });
 });
 
-
-export const loginUser = TryCatch(async(req, res) => {
-    
-})
