@@ -7,7 +7,7 @@ dotenv.config();
 
 await connectDb();
 
-const redisUrl = process.env.REDIS_URL
+const redisUrl = process.env.REDIS_URL;
 
 if(!redisUrl) {
 console.log("Missing Redis Url");
