@@ -48,20 +48,87 @@ This service supports:
 ## System Architecture
 
 ```mermaid
-flowchart LR
-  A[Frontend Client] -->|POST /api/v1/register| B[Express Auth API]
-  A -->|POST /api/v1/login| B
-  A -->|POST /api/v1/verify| B
-  A -->|GET /api/v1/me| B
-  B --> C[Redis]
-  B --> D[MongoDB]
-  B --> E[SMTP Mail Server]
-  B --> F[JWT Access / Refresh Cookies]
-  style B fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
-  style C fill:#f8fafc,stroke:#0f172a
-  style D fill:#ecfccb,stroke:#166534
-  style E fill:#e0f2fe,stroke:#0284c7
-  style F fill:#ede9fe,stroke:#7c3aed
+flowchart TB
+
+%% =========================
+%% CLIENT LAYER
+%% =========================
+subgraph CLIENT["Client Layer"]
+    A[Frontend Client]
+end
+
+%% =========================
+%% API LAYER
+%% =========================
+subgraph API["Express API Layer"]
+    B[Express Server]
+
+    R[User Routes]
+    M[Auth Middleware]
+    C[User Controller]
+
+    B --> R
+    R --> M
+    M --> C
+end
+
+%% =========================
+%% VALIDATION & SECURITY
+%% =========================
+subgraph SECURITY["Security & Validation"]
+    Z[Zod Validation]
+    J[JWT Token Service]
+end
+
+%% =========================
+%% DATA LAYER
+%% =========================
+subgraph DATA["Data Layer"]
+    REDIS[(Redis Cache)]
+    MONGO[(MongoDB)]
+end
+
+%% =========================
+%% EXTERNAL SERVICES
+%% =========================
+subgraph EXTERNAL["External Services"]
+    SMTP[SMTP Mail Server]
+end
+
+%% =========================
+%% FLOW
+%% =========================
+A -->|Register/Login/Verify| B
+
+C --> Z
+C --> J
+
+C --> REDIS
+C --> MONGO
+C --> SMTP
+
+J --> COOKIES[Access & Refresh Cookies]
+
+%% =========================
+%% COLORS
+%% =========================
+
+style A fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
+
+style B fill:#000000,stroke:#000000,stroke-width:3px,color:#ffffff
+style R fill:#f5f5f5,stroke:#000000,color:#000000
+style M fill:#f5f5f5,stroke:#000000,color:#000000
+style C fill:#f5f5f5,stroke:#000000,color:#000000
+
+style Z fill:#e5e5e5,stroke:#000000,color:#000000
+style J fill:#d4d4d4,stroke:#000000,color:#000000
+
+style REDIS fill:#fafafa,stroke:#000000,color:#000000
+style MONGO fill:#fafafa,stroke:#000000,color:#000000
+
+style SMTP fill:#ffffff,stroke:#000000,color:#000000
+
+style COOKIE fill:#262626,stroke:#000000,color:#ffffff
 ``` 
 
 ## Authentication Flow
@@ -96,23 +163,6 @@ sequenceDiagram
   API->>Client: set accessToken + refreshToken cookies
   Client->>API: GET /api/v1/me (authenticated)
 ``` 
-
-## Database Relationship Diagram
-
-```mermaid
-erDiagram
-    USER {
-      ObjectId _id PK
-      String name
-      String email UNIQUE
-      String password
-      String role
-      Date createdAt
-      Date updatedAt
-    }
-```
-
-> Note: This project currently maintains a single `User` entity. Additional domain models can be added for products, carts, orders, and inventory.
 
 ## API Request / Response Flow
 
@@ -416,5 +466,3 @@ This repository is licensed under the ISC License.
 ---
 
 If you need help integrating the frontend or extending this auth API for product and order workflows, feel free to open an issue or request enhancements.
-
-<img width="2016" height="4940" alt="diagram" src="https://github.com/user-attachments/assets/817b7d13-1bd1-4f1d-9975-e8b0de4fcad7" />
