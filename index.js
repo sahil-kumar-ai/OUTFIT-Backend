@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import connectDb from './config/db.js';
 import {createClient} from 'redis';
+import cookieParser from "cookie-parser"
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ const app = express();
 
 // Middlewares
 app.use(express.json());
+app.use(cookieParser());
 
 // Importing Routes
 import userRoutes from './routes/user.js';
